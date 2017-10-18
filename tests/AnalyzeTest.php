@@ -3,8 +3,10 @@
 use ColorTools\Image;
 use ColorTools\Palette;
 
+use PHPUnit\Framework\TestCase;
 
-class AnalyzeTest extends PHPUnit_Framework_TestCase
+
+class AnalyzeTest extends TestCase
 {
     public static $image = null;
     public static $analysis = null;

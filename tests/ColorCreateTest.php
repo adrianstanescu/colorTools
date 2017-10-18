@@ -2,7 +2,9 @@
 
 use ColorTools\Color;
 
-class ColorCreateTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class ColorCreateTest extends TestCase
 {
     /**
      * @expectedException           ColorTools\Exception
@@ -117,23 +119,25 @@ class ColorCreateTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($color->getRgb(), ['red'=>1, 'green'=>2, 'blue'=>3]);
 
         // create from red, green, blue, alpha array
-        $color = Color::create(['red'=>1, 'green'=>2, 'blue'=>3, 'alpha'=>'ville']);
+        $color = Color::create(['red'=>1, 'green'=>2, 'blue'=>3, 'alpha'=>0.5]);
         $this->assertEquals($color->getRgb(), ['red'=>1, 'green'=>2, 'blue'=>3]);
+        $this->assertEquals($color->getAlpha(), 0.5);
 
         // create from r, g, b array
         $color = Color::create(['r'=>1, 'g'=>2, 'b'=>3]);
         $this->assertEquals($color->getRgb(), ['red'=>1, 'green'=>2, 'blue'=>3]);
 
         // create from r, g, b, a array
-        $color = Color::create(['r'=>1, 'g'=>2, 'b'=>3, 'a'=>'forever young']);
+        $color = Color::create(['r'=>1, 'g'=>2, 'b'=>3, 'a'=>0.5]);
         $this->assertEquals($color->getRgb(), ['red'=>1, 'green'=>2, 'blue'=>3]);
+        $this->assertEquals($color->getAlpha(), 0.5);
 
         // create keyless array with 3 values
         $color = Color::create([1, 2, 3]);
         $this->assertEquals($color->getRgb(), ['red'=>1, 'green'=>2, 'blue'=>3]);
 
         // or 4 values
-        $color = Color::create([1, 2, 3, 'some alpha stuff that I am ignoring']);
+        $color = Color::create([1, 2, 3, 0.5]);
         $this->assertEquals($color->getRgb(), ['red'=>1, 'green'=>2, 'blue'=>3]);
 
         // csv string with 3 elements
@@ -159,7 +163,7 @@ class ColorCreateTest extends PHPUnit_Framework_TestCase
         $color = Color::create('rgb (1,  2  , 3)');
         $this->assertEquals($color->getRgb(), ['red'=>1, 'green'=>2, 'blue'=>3]);
 
-        $color = Color::create('rgb (1,  2  , 3, 50);');
+        $color = Color::create('rgb (1,  2  , 3, 0.5);');
         $this->assertEquals($color->getRgb(), ['red'=>1, 'green'=>2, 'blue'=>3]);
 
         // using the setRgb method
@@ -191,6 +195,16 @@ class ColorCreateTest extends PHPUnit_Framework_TestCase
 
         $color3 = Color::create($color1->rgb);
         $this->assertEquals($color2->getRgb(), ['red'=>1, 'green'=>2, 'blue'=>3]);
+    }
+
+    /**
+     * @expectedException           ColorTools\Exception
+     * @expectedExceptionMessage    Alpha value should be between 0.0 and 1.0
+     */
+    public function testCreateRgbaFailsRange()
+    {
+        // the rgb values are out of range
+        $color = Color::create('rgba(1, 2, 3, 1.1');
     }
 
     /**
@@ -461,5 +475,15 @@ class ColorCreateTest extends PHPUnit_Framework_TestCase
 
         $color = Color::create('black');
         $this->assertEquals($color->hex, '#000000');
+    }
+
+    public function testRgba() {
+        $color = Color::create('red');
+        $this->assertEquals(1, $color->alpha);
+        $this->assertEquals('rgba(255, 0, 0, 1)', $color->rgba);
+
+        $color = Color::create('rgba(1, 2, 3, 0.5)');
+        $this->assertEquals(0.5, $color->alpha);
+        $this->assertEquals('rgba(1, 2, 3, 0.5)', $color->rgba);
     }
 }

@@ -2,7 +2,9 @@
 
 use ColorTools\Image;
 
-class ImageOutputTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class ImageOutputTest extends TestCase
 {
     private $testImgPath = './samples/test-small.jpg';
 

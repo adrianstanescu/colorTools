@@ -3,7 +3,9 @@
 use ColorTools\Image;
 use ColorTools\Histogram;
 
-class HistogramTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class HistogramTest extends TestCase
 {
     private $testImgPath = './samples/test-small.jpg';
 

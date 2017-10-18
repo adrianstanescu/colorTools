@@ -2,7 +2,9 @@
 
 use ColorTools\Color;
 
-class ColorFunctionsTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class ColorFunctionsTest extends TestCase
 {
     public function testSetRGBValues() {
         $random = Color::create(rand(0, 0xffffff));

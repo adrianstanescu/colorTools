@@ -3,6 +3,7 @@
 class Color
 {
     private $value = null;
+    public $alpha = 1.0;
     private $name = null;
     private $details = [];
     private $similarColor = null;
@@ -57,14 +58,23 @@ class Color
                     $red=$color['r'];
                     $green=$color['g'];
                     $blue=$color['b'];
+                    if (isset($color['a'])) {
+                        $this->setAlpha($color['a']);
+                    }
                 } else if(isset($color['red']) and isset($color['green']) and isset($color['blue'])) {
                     $red=$color['red'];
                     $green=$color['green'];
                     $blue=$color['blue'];
+                    if (isset($color['alpha'])) {
+                        $this->setAlpha($color['alpha']);
+                    }
                 } else if(isset($color[0]) and isset($color[1]) and isset($color[2]) and count($color) <= 4) {
                     $red=$color[0];
                     $green=$color[1];
                     $blue=$color[2];
+                    if (isset($color[3])) {
+                        $this->setAlpha($color[3]);
+                    }
                 } else {
                     throw new Exception('I cannot make sense of this array, sorry...');
                 }
@@ -119,7 +129,7 @@ class Color
                     }
                 } else if(strpos($color, 'rgb')!==false or strpos($color, ',')!==false) {
                     // i hope this is some sort of rgb(r,g,b) kinda string, or maybe even rgba(r,g,b,a) - ignoring a
-                    $color = trim(str_replace(array('rgba', 'rgb', '(', ')'), '', $color), "\r\n\t ");
+                    $color = trim(str_replace(array('rgba', 'rgb', '(', ')', ';'), '', $color), "\r\n\t ");
                     if(strpos($color, ',')!==false) {
                         $color = str_replace(' ', '', $color);
                         $color = explode(',', $color);
@@ -128,6 +138,10 @@ class Color
                                 throw new Exception('If this is rgb, one of the channels is over 255...');
                             }
                             $this->value = $color[0] * 256*256 + $color[1] * 256 + $color[2];
+                        }
+                        // alpha
+                        if (isset($color[3])) {
+                            $this->setAlpha($color[3]);
                         }
                     }
                 } else if(isset($this->cssColors[strtolower($color)])) {
@@ -228,6 +242,11 @@ class Color
             return 'rgb('.implode(', ', $rgb).')';
         }
 
+        if ($param == 'rgba') {
+            $rgb = $this->getRgb();
+            return 'rgba(' . implode(', ', $rgb) . ', ' . $this->getAlpha() . ')';
+        }
+
         if($param == 'red' or $param == 'r') {
             return $this->getRed();
         }
@@ -238,6 +257,10 @@ class Color
 
         if($param == 'blue' or $param == 'b') {
             return $this->getBlue();
+        }
+
+        if($param == 'alpha' or $param == 'a') {
+            return $this->getAlpha();
         }
 
         if(in_array($param, ['grayscale', 'gray', 'mono'])) {
@@ -339,6 +362,8 @@ class Color
             $this->setGreen($value);
         } else if($param == 'b' or $param=='blue') {
             $this->setBlue($value);
+        } else if($param == 'a' or $param=='alpha') {
+            $this->setAlpha($value);
         } else if(substr($param, 0, 1)=='_') {
             $this->details[$param] = $value;
         } else {
@@ -459,6 +484,17 @@ class Color
         } else {
             throw new Exception('There is something wrong with this blue: '.print_r($value, true));
         }
+    }
+    public function getAlpha() {
+        return $this->alpha;
+    }
+
+    public function setAlpha($value) {
+        $alpha = floatval($value);
+        if (!is_numeric($value) or $alpha < 0 or $alpha > 1) {
+            throw new Exception('Alpha value should be between 0.0 and 1.0');
+        }
+        $this->alpha = $alpha;
     }
 
     public function getRgb()
